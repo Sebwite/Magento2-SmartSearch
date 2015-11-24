@@ -1,0 +1,18 @@
+{
+    "name": "sebwite/magento2-smartsearch",
+    "description": "Magento 2.0 SmartSearch",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": "~5.5.0|~5.6.0",
+        "magento/magento-composer-installer": "*"
+    },
+    "autoload": {
+        "psr-4": { "Sebwite\\SmartSearch\\": "" },
+        "files": [ "registration.php" ]
+    }
+}

@@ -1,0 +1,57 @@
+<?php
+/*
+|--------------------------------------------------------------------------
+|   form.mini
+|--------------------------------------------------------------------------
+|
+|   Autocomplete Search Form
+|
+|   @author Sebwite
+|   @date 24 november 2015
+|   @time 10:13
+*/
+
+/** @var $this \Magento\Framework\View\Element\Template */
+/** @var $helper \Magento\Search\Helper\Data */
+$helper = $this->helper('Magento\Search\Helper\Data');
+?>
+<div class="has-toggle search-sections">
+
+  <div class="inner-toggle clearfix">
+    <div class="block block-search">
+        <div class="block block-title"><strong><?php echo __('Search'); ?></strong></div>
+        <div class="block block-content">
+            <form class="form minisearch" id="search_mini_form" action="<?php echo $helper->getResultUrl() ?>" method="get">
+                <div class="field search">
+                    <div class="control">
+                        <input id="search"
+                               data-mage-init='{"quickSearch":{
+                                    "formSelector":"#search_mini_form",
+                                    "url":"<?php echo $this->getUrl('search/ajax/suggest'); ?>",
+                                    "destinationSelector":"#search_autocomplete"}
+                               }'
+                               type="text"
+                               name="<?php echo $helper->getQueryParamName() ?>"
+                               value="<?php echo $helper->getEscapedQueryText() ?>"
+                               placeholder="<?php echo __('Search entire store here...'); ?>"
+                               class="input-text"
+                               autocomplete="off"/>
+                        <div id="search_autocomplete" class="search-autocomplete"></div>
+
+                        <?php echo $this->getChildHtml() ?>
+                    </div>
+                    <!-- .control -->
+
+                    <button type="submit" value="Zoeken" class="btn btn-search"><?php echo __('Search'); ?></button>
+
+                </div> <!-- .field .search -->
+                <div class="actions"></div>
+            </form>
+        </div>
+        <!-- .block-content -->
+    </div>
+    <!-- .block-search -->
+  </div>
+  <!-- .inner-toggle -->
+</div>
+<!-- .search-sections -->
