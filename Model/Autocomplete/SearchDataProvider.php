@@ -12,6 +12,7 @@
 */
 namespace Sebwite\SmartSearch\Model\Autocomplete;
 
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Search\Model\QueryFactory;
 use Magento\Search\Model\Autocomplete\DataProviderInterface;
 use Magento\Search\Model\Autocomplete\ItemFactory;
@@ -57,6 +58,10 @@ class SearchDataProvider implements DataProviderInterface
      * @var StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceCurrency;
 
     /**
      * Initialize dependencies.
@@ -70,6 +75,7 @@ class SearchDataProvider implements DataProviderInterface
      * @param ProductRepositoryInterface    $productRepository
      * @param SearchCriteriaBuilder         $searchCriteriaBuilder
      * @param StoreManagerInterface         $storeManager
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface        $priceCurrency
      */
     public function __construct(
         QueryFactory $queryFactory,
@@ -80,7 +86,8 @@ class SearchDataProvider implements DataProviderInterface
         FilterBuilder $filterBuilder,
         ProductRepositoryInterface $productRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        PriceCurrencyInterface $priceCurrency
     ) {
         $this->queryFactory = $queryFactory;
         $this->itemFactory = $itemFactory;
@@ -91,6 +98,7 @@ class SearchDataProvider implements DataProviderInterface
         $this->productRepository = $productRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->storeManager = $storeManager;
+        $this->priceCurrency = $priceCurrency;
     }
 
     /**
@@ -101,28 +109,34 @@ class SearchDataProvider implements DataProviderInterface
         $result = [];
         $query = $this->queryFactory->get()->getQueryText();
         $productIds = $this->searchProductsFullText($query);
+
+        // Check if products are found
         if ($productIds) {
             $searchCriteria = $this->searchCriteriaBuilder->addFilter('entity_id', $productIds, 'in')->create();
             $products = $this->productRepository->getList($searchCriteria);
 
             $baseUrl = $this->storeManager->getStore()->getBaseUrl();
 
+            // Loop through products
+
             foreach ($products->getItems() as $product) {
 
-//                $price = number_format ( $product->getPrice() , 2 , "," ,".");
-                $price = number_format($product->getPrice(), 2);
-
+//                $price = number_format($product->getPrice(), 2);
+//                $product->getFormatedPrice();
                 $resultItem = $this->itemFactory->create([
 
                     /** Feel free to add here necessary product data and then render in template */
-                    'title' => $product->getName(),
-                    'price' => '€ '. $price,
-                    'image' => str_replace('index.php/', '', $baseUrl) . '/pub/media/catalog/product' . $product->getImage(),
-                    'url'   => $product->getProductUrl()
+                    'title'             => $product->getName(),
+                    'price'             => $this->priceCurrency->format($product->getPrice(), false),
+                    'special_price'     => $this->priceCurrency->format($product->getSpecialPrice(), false),
+                    'has_special_price' => $product->getSpecialPrice() > 0 ? true : false,
+                    'image'             => str_replace('index.php/', '', $baseUrl) . '/pub/media/catalog/product' . $product->getImage(),
+                    'url'               => $product->getProductUrl()
                 ]);
                 $result[] = $resultItem;
             }
         }
+
         return $result;
     }
 
