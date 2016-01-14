@@ -7,9 +7,9 @@ Magento 2 SmartSearch implementation. This is a basic extension without any conf
 * Upgrade db scheme: php bin/magento setup:upgrade
 * Clear cache
 
-After these steps the smart search will be visible.
+After these steps the default Magento 2 searchbar will be transformed into a smartsearch searchbar.
 
 ##Todo's:
-* Retrieve currency symbol from Magento (now € is used)
 * Add config page
 * Show loading indicator
+* Add cache
