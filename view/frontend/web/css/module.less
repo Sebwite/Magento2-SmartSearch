@@ -1,6 +1,9 @@
 /** ================================================================
   *                         SMARTSEARCH
   * ============================================================= */
+#search.loading {
+
+}
 #search_autocomplete {
   position: absolute;
   left: 0;
@@ -9,7 +12,6 @@
   height: 100%;
   overflow: visible;
 }
-
 .c-smartsearch {
   text-transform: uppercase;
 }
@@ -45,10 +47,22 @@
 }
 .c-smartsearch__title {
   text-decoration: none;
+  float: left;
+  clear: both;
 }
 .c-smartsearch {
   .c-smartsearch__sale--accent {
     color: #3a3a3a;
+  }
+  .c-smartsearch__price {
+    float: left;
+
+    > span {
+      padding-right: 2px;
+    }
+  }
+  .u-strike-through {
+    text-decoration: line-through;
   }
   .col-8-8 {
     width: 89%;

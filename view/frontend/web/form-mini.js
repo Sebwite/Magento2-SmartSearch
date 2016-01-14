@@ -41,13 +41,16 @@ define([
                         '<%- data.title %>' +
                     '</a>' +
 
-                    //'<div class="c-smartsearch__price">' +
-                    //    'Prijs: <span class="u-strike-through"><%- data.price %></span>' +
-                    //'</div>' +
-
-                    '<div class="c-smartsearch__sale">' +
-                        '<span class="c-smartsearch__sale--accent">' + $.mage.__("Price:") + ' <%- data.price %></span>' +
+                    '<div class="c-smartsearch__price">' +
+                        '<span>' + $.mage.__("Price:") + ' <span class="<% if (data.has_special_price) { %> u-strike-through <% } %> ">' + '<%- data.price %></span></span>' +
                     '</div>' +
+
+                '<% if (data.has_special_price) { %>' +
+                    '<div class="c-smartsearch__sale">' +
+                        '<span class="c-smartsearch__sale--accent"> <%- data.special_price %></span>' +
+                    '</div>' +
+                '<% } %>'
+                +
                 '</div> <!-- .c-smartsearch__product col-8-8 -->'
             ,
             submitBtn: 'button[type="submit"]',
@@ -206,8 +209,6 @@ define([
                     break;
                 case $.ui.keyCode.UP:
 
-                    $('#search').addClass('loading');
-
                     if (this.responseList.indexList !== null) {
                         if (!this._getFirstVisibleElement().hasClass(this.options.selectClass)) {
                             this.responseList.selected = this.responseList.selected.removeClass(this.options.selectClass).prev().addClass(this.options.selectClass);
@@ -250,7 +251,14 @@ define([
             this.submitBtn.disabled = isEmpty(value);
 
             if (value.length >= parseInt(this.options.minSearchLength, 10)) {
+
+                $('#search').addClass('loading');
+
                 $.get(this.options.url, {q: value}, $.proxy(function (data) {
+
+                    // Check if SmartSearch returned results
+                    if( ! data.length)
+                        dropdown.find('.c-smartsearch__content').append('<div class="c-smartsearch__product col-8-8">' + $.mage.__('No products found.') + '</div>');
 
                     $.each(data, function(index, element) {
                         element.index = index;
@@ -260,12 +268,13 @@ define([
                         });
                         dropdown.find('.c-smartsearch__content').append(html);
                     });
+
                     this.responseList.indexList = this.autoComplete.html(dropdown)
                         .css(clonePosition)
                         .show()
                         .find(this.options.responseFieldElements + ':visible');
 
-                    // $('#search').removeClass('loading');
+                     $('#search').removeClass('loading');
 
                     this._resetResponseList(false);
                     this.element.removeAttr('aria-activedescendant');
