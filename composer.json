@@ -1,18 +1,29 @@
 {
-    "name": "sebwite/magento2-smartsearch",
-    "description": "Magento 2.0 SmartSearch",
-    "type": "magento2-module",
-    "version": "1.0.1",
-    "license": [
-        "OSL-3.0",
-        "AFL-3.0"
-    ],
-    "require": {
-        "php": "~5.5.0|~5.6.0",
-        "magento/magento-composer-installer": "*"
+  "name": "sebwite/magento2-smartsearch",
+  "description": "Magento 2.0 SmartSearch",
+  "type": "magento2-module",
+  "version": "1.0.1",
+  "license": [
+    "OSL-3.0",
+    "AFL-3.0"
+  ],
+  "require": {
+    "php": "~5.5.0|~5.6.0",
+    "magento/magento-composer-installer": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sebwite\\SmartSearch\\": ""
     },
-    "autoload": {
-        "psr-4": { "Sebwite\\SmartSearch\\": "" },
-        "files": [ "registration.php" ]
-    }
+    "files": [
+      "registration.php"
+    ]
+  },
+  "scripts": {
+    "post-package-install": [
+      "php -f bin/magento module:enable Sebwite_SmartSearch",
+      "php -f bin/magento setup:upgrade",
+      "php -f bin/magento cache:clear"
+    ]
+  }
 }
