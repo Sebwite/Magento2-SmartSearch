@@ -1,4 +1,6 @@
 # Magento 2.0 SmartSearch
+![Alt text](header.jpg?raw=true "Type ahead search")
+
 Magento 2 type ahead search implementation. Shows a list of found products under the searchbar without reloading the page.
 This is a basic extension without any config options that replaces the default Magento autocomplete with a smart search implementation.
 
