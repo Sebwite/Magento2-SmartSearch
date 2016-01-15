@@ -21,9 +21,9 @@
   },
   "scripts": {
     "post-package-install": [
-      "php -f bin/magento module:enable Sebwite_SmartSearch",
-      "php -f bin/magento setup:upgrade",
-      "php -f bin/magento cache:clear"
+      "bin/magento module:enable Sebwite_SmartSearch",
+      "bin/magento setup:upgrade",
+      "bin/magento cache:clear"
     ]
   }
 }
