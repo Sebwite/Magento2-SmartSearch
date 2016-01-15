@@ -12,16 +12,16 @@
 */
 namespace Sebwite\SmartSearch\Model\Autocomplete;
 
-use Magento\Framework\Pricing\PriceCurrencyInterface;
-use Magento\Search\Model\QueryFactory;
-use Magento\Search\Model\Autocomplete\DataProviderInterface;
-use Magento\Search\Model\Autocomplete\ItemFactory;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\Search\FilterGroupBuilder;
 use Magento\Framework\Api\Search\SearchCriteriaFactory as FullTextSearchCriteriaFactory;
 use Magento\Framework\Api\Search\SearchInterface as FullTextSearchApi;
-use Magento\Framework\Api\Search\FilterGroupBuilder;
-use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Search\Model\Autocomplete\DataProviderInterface;
+use Magento\Search\Model\Autocomplete\ItemFactory;
+use Magento\Search\Model\QueryFactory;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
@@ -62,20 +62,24 @@ class SearchDataProvider implements DataProviderInterface
      * @var PriceCurrencyInterface
      */
     private $priceCurrency;
+    /**
+     * @var ProductHelper
+     */
+    private $productHelper;
 
     /**
      * Initialize dependencies.
      *
-     * @param QueryFactory                  $queryFactory
-     * @param ItemFactory                   $itemFactory
-     * @param FullTextSearchApi             $search
-     * @param FullTextSearchCriteriaFactory $searchCriteriaFactory
-     * @param FilterGroupBuilder            $searchFilterGroupBuilder
-     * @param FilterBuilder                 $filterBuilder
-     * @param ProductRepositoryInterface    $productRepository
-     * @param SearchCriteriaBuilder         $searchCriteriaBuilder
-     * @param StoreManagerInterface         $storeManager
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface        $priceCurrency
+     * @param QueryFactory                                      $queryFactory
+     * @param ItemFactory                                       $itemFactory
+     * @param FullTextSearchApi                                 $search
+     * @param FullTextSearchCriteriaFactory                     $searchCriteriaFactory
+     * @param FilterGroupBuilder                                $searchFilterGroupBuilder
+     * @param FilterBuilder                                     $filterBuilder
+     * @param ProductRepositoryInterface                        $productRepository
+     * @param SearchCriteriaBuilder                             $searchCriteriaBuilder
+     * @param StoreManagerInterface                             $storeManager
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      */
     public function __construct(
         QueryFactory $queryFactory,
@@ -121,13 +125,8 @@ class SearchDataProvider implements DataProviderInterface
 
             foreach ($products->getItems() as $product) {
 
-//                $price = number_format($product->getPrice(), 2);
-//                $product->getFormatedPrice();
                 $resultItem = $this->itemFactory->create([
-
-                    /** Feel free to add here necessary product data and then render in template */
-                    'title'             => $product->getName(),
-                    'price'             => $this->priceCurrency->format($product->getPrice(), false),
+                    'title'             => $product->getName(), 'price' => $this->priceCurrency->format($product->getFinalPrice(), false),
                     'special_price'     => $this->priceCurrency->format($product->getSpecialPrice(), false),
                     'has_special_price' => $product->getSpecialPrice() > 0 ? true : false,
                     'image'             => str_replace('index.php/', '', $baseUrl) . '/pub/media/catalog/product' . $product->getImage(),
@@ -149,6 +148,7 @@ class SearchDataProvider implements DataProviderInterface
     private function searchProductsFullText($query)
     {
         $searchCriteria = $this->fullTextSearchCriteriaFactory->create();
+
         /** To get list of available request names see Magento/CatalogSearch/etc/search_request.xml */
         $searchCriteria->setRequestName('quick_search_container');
         $filter = $this->filterBuilder->setField('search_term')->setValue($query)->setConditionType('like')->create();

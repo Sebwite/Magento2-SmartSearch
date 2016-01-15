@@ -1,8 +1,16 @@
 # Magento 2.0 SmartSearch
-Magento 2 SmartSearch implementation. This is a basic extension without any config options that replaces the default Magento autocomplete with a smart search implementation.
+Magento 2 type ahead search implementation. Shows a list of found products under the searchbar without reloading the page.
+This is a basic extension without any config options that replaces the default Magento autocomplete with a smart search implementation.
 
 ## Installation with composer
 * Include the repository: `composer require sebwite/magento2-smartsearch`
+* Enable the extension: `php bin/magento --clear-static-content module:enable Sebwite_SmartSearch`
+* Upgrade db scheme: `php bin/magento setup:upgrade`
+* Clear cache
+
+## Installation without composer
+* Download zip file of this extension
+* Place all the files of the extension in your Magento 2 installation in the folder app/code/Sebwite/SmartSearch
 * Enable the extension: `php bin/magento --clear-static-content module:enable Sebwite_SmartSearch`
 * Upgrade db scheme: `php bin/magento setup:upgrade`
 * Clear cache
