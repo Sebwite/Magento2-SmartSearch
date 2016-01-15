@@ -2,6 +2,9 @@
 Magento 2 type ahead search implementation. Shows a list of found products under the searchbar without reloading the page.
 This is a basic extension without any config options that replaces the default Magento autocomplete with a smart search implementation.
 
+## Screenshot
+![Alt text](screenshot.png?raw=true "Magento 2 auto fill search extension")
+
 ## Installation with composer
 * Include the repository: `composer require sebwite/magento2-smartsearch`
 * Enable the extension: `php bin/magento --clear-static-content module:enable Sebwite_SmartSearch`
