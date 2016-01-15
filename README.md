@@ -26,5 +26,5 @@ After these steps the default Magento 2 searchbar will be transformed into a sma
 * Add cache
 
 ---
-[![Alt text](https://www.sebwite.nl/wp-content/themes/sebwite/assets/images/logo-sebwite.png "Sebwite.nl")](https://sebwite.nl target="_blank")
+[![Alt text](https://www.sebwite.nl/wp-content/themes/sebwite/assets/images/logo-sebwite.png "Sebwite.nl")](https://sebwite.nl)
 
