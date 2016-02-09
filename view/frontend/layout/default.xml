@@ -1,12 +1,15 @@
-<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="Sebwite_SmartSearch::css/module.css"/>
     </head>
-    <referenceContainer name="header-wrapper">
-        <referenceBlock name="top.search">
-            <arguments>
-                <argument name="template" xsi:type="string">Sebwite/SmartSeach/templates/form.mini.phtml</argument>
-            </arguments>
-        </referenceBlock>
-    </referenceContainer>
-</layout>
+    <body>    
+        <referenceContainer name="header-wrapper">
+            <referenceBlock name="top.search">
+                <arguments>
+                    <argument name="template" xsi:type="string">Sebwite/SmartSeach/templates/form.mini.phtml</argument>
+                </arguments>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>
