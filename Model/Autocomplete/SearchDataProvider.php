@@ -13,6 +13,7 @@
 namespace Sebwite\SmartSearch\Model\Autocomplete;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Helper\Image;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\FilterGroupBuilder;
 use Magento\Framework\Api\Search\SearchCriteriaFactory as FullTextSearchCriteriaFactory;
@@ -25,7 +26,11 @@ use Magento\Search\Model\QueryFactory;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
- * Full text search implementation of autocomplete.
+ *  Full text search implementation of autocomplete.
+ *
+ * @package        Sebwite\SmartSearch
+ * @author         Sebwite
+ * @copyright      Copyright (c) 2015, Sebwite. All rights reserved
  */
 class SearchDataProvider implements DataProviderInterface
 {
@@ -54,18 +59,24 @@ class SearchDataProvider implements DataProviderInterface
 
     /** @var SearchCriteriaBuilder */
     protected $searchCriteriaBuilder;
+
     /**
      * @var StoreManagerInterface
      */
-    private $storeManager;
+    protected $storeManager;
+
     /**
      * @var PriceCurrencyInterface
      */
-    private $priceCurrency;
+    protected $priceCurrency;
+
     /**
      * @var ProductHelper
      */
-    private $productHelper;
+    protected $productHelper;
+
+    /** @var \Magento\Catalog\Helper\Image */
+    protected $imageHelper;
 
     /**
      * Initialize dependencies.
@@ -80,6 +91,7 @@ class SearchDataProvider implements DataProviderInterface
      * @param SearchCriteriaBuilder                             $searchCriteriaBuilder
      * @param StoreManagerInterface                             $storeManager
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
+     * @param \Magento\Catalog\Helper\Image                     $imageHelper
      */
     public function __construct(
         QueryFactory $queryFactory,
@@ -91,48 +103,54 @@ class SearchDataProvider implements DataProviderInterface
         ProductRepositoryInterface $productRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         StoreManagerInterface $storeManager,
-        PriceCurrencyInterface $priceCurrency
-    ) {
-        $this->queryFactory = $queryFactory;
-        $this->itemFactory = $itemFactory;
-        $this->fullTextSearchApi = $search;
+        PriceCurrencyInterface $priceCurrency,
+        Image $imageHelper
+    )
+    {
+        $this->queryFactory                  = $queryFactory;
+        $this->itemFactory                   = $itemFactory;
+        $this->fullTextSearchApi             = $search;
         $this->fullTextSearchCriteriaFactory = $searchCriteriaFactory;
-        $this->filterBuilder = $filterBuilder;
-        $this->searchFilterGroupBuilder = $searchFilterGroupBuilder;
-        $this->productRepository = $productRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->storeManager = $storeManager;
-        $this->priceCurrency = $priceCurrency;
+        $this->filterBuilder                 = $filterBuilder;
+        $this->searchFilterGroupBuilder      = $searchFilterGroupBuilder;
+        $this->productRepository             = $productRepository;
+        $this->searchCriteriaBuilder         = $searchCriteriaBuilder;
+        $this->storeManager                  = $storeManager;
+        $this->priceCurrency                 = $priceCurrency;
+        $this->imageHelper                   = $imageHelper;
     }
 
     /**
-     * {@inheritdoc}
+     * getItems method
+     *
+     * @return array
      */
     public function getItems()
     {
-        $result = [];
-        $query = $this->queryFactory->get()->getQueryText();
+        $result     = [ ];
+        $query      = $this->queryFactory->get()->getQueryText();
         $productIds = $this->searchProductsFullText($query);
 
         // Check if products are found
-        if ($productIds) {
+        if ( $productIds )
+        {
             $searchCriteria = $this->searchCriteriaBuilder->addFilter('entity_id', $productIds, 'in')->create();
-            $products = $this->productRepository->getList($searchCriteria);
+            $products       = $this->productRepository->getList($searchCriteria);
 
-            $baseUrl = $this->storeManager->getStore()->getBaseUrl();
+            foreach ( $products->getItems() as $product )
+            {
 
-            // Loop through products
-
-            foreach ($products->getItems() as $product) {
+                $image = $this->imageHelper->init($product, 'product_page_image_small')->getUrl();
 
                 $resultItem = $this->itemFactory->create([
-                    'title'             => $product->getName(), 'price' => $this->priceCurrency->format($product->getFinalPrice(), false),
+                    'title'             => $product->getName(),
+                    'price'             => $this->priceCurrency->format($product->getFinalPrice(), false),
                     'special_price'     => $this->priceCurrency->format($product->getSpecialPrice(), false),
                     'has_special_price' => $product->getSpecialPrice() > 0 ? true : false,
-                    'image'             => str_replace('index.php/', '', $baseUrl) . '/pub/media/catalog/product' . $product->getImage(),
+                    'image'             => $image,
                     'url'               => $product->getProductUrl()
                 ]);
-                $result[] = $resultItem;
+                $result[]   = $resultItem;
             }
         }
 
@@ -142,30 +160,34 @@ class SearchDataProvider implements DataProviderInterface
     /**
      * Perform full text search and find IDs of matching products.
      *
-     * @param string
-     * @return int[]
+     * @param $query
+     *
+     * @return array
      */
-    private function searchProductsFullText($query)
+    protected function searchProductsFullText($query)
     {
         $searchCriteria = $this->fullTextSearchCriteriaFactory->create();
 
         /** To get list of available request names see Magento/CatalogSearch/etc/search_request.xml */
         $searchCriteria->setRequestName('quick_search_container');
-        $filter = $this->filterBuilder->setField('search_term')->setValue($query)->setConditionType('like')->create();
+        $filter      = $this->filterBuilder->setField('search_term')->setValue($query)->setConditionType('like')->create();
         $filterGroup = $this->searchFilterGroupBuilder->addFilter($filter)->create();
         $currentPage = 1;
-        $searchCriteria->setFilterGroups([$filterGroup])
+        $searchCriteria->setFilterGroups([ $filterGroup ])
             ->setCurrentPage($currentPage)
             ->setPageSize(self::PRODUCTS_NUMBER_IN_SUGGEST);
         $searchResults = $this->fullTextSearchApi->search($searchCriteria);
-        $productIds = [];
+        $productIds    = [ ];
+
         /**
          * Full text search returns document IDs (in this case product IDs),
          * so to get products information we need to load them using filtration by these IDs
          */
-        foreach ($searchResults->getItems() as $searchDocument) {
+        foreach ( $searchResults->getItems() as $searchDocument )
+        {
             $productIds[] = $searchDocument->getId();
         }
+
         return $productIds;
     }
 }

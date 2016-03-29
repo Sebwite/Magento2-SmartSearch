@@ -252,9 +252,13 @@ define([
 
             if (value.length >= parseInt(this.options.minSearchLength, 10)) {
 
-                $('#search').addClass('loading');
+                $('#search_mini_form').addClass('is-loading');
 
-                $.get(this.options.url, {q: value}, $.proxy(function (data) {
+                if(this.request) {
+                    this.request.abort();
+                }
+
+                this.request = $.get(this.options.url, {q: value}, $.proxy(function (data) {
 
                     // Check if SmartSearch returned results
                     if( ! data.length)
@@ -274,7 +278,7 @@ define([
                         .show()
                         .find(this.options.responseFieldElements + ':visible');
 
-                     $('#search').removeClass('loading');
+                    $('#search_mini_form').removeClass('is-loading');
 
                     this._resetResponseList(false);
                     this.element.removeAttr('aria-activedescendant');
