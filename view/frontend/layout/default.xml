@@ -7,7 +7,7 @@
         <referenceContainer name="header-wrapper">
             <referenceBlock name="top.search">
                 <arguments>
-                    <argument name="template" xsi:type="string">Sebwite/SmartSeach/templates/form.mini.phtml</argument>
+                    <argument name="template" xsi:type="string">Sebwite/SmartSearch/templates/form.mini.phtml</argument>
                 </arguments>
             </referenceBlock>
         </referenceContainer>
